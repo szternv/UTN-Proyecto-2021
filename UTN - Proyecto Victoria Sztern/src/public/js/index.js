@@ -1,4 +1,15 @@
 const FormContact = document.querySelector("#FormContact");
+let TablaNovedades = document.querySelector("#TablaNovedades");
+let AgregarNovedad = document.querySelector("#AgregarNovedad");
+let FormNovedades = document.querySelector("#FormNovedades");
+let SubmitNovedad = document.querySelector("#SubmitNovedad");
+
+
+// Get the button that opens the modal
+var modal = document.getElementById("myModal");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("closeX")[0];
 
 const PostToServer = async (url, data) => {
 	if (!url) throw new Error("Url to POST is empty");
@@ -19,6 +30,99 @@ const PostToServer = async (url, data) => {
 	return response.json();
 }
 
+const DeleteToServer = async (url, data) => {
+	if (!url) throw new Error("Url to DELETE is empty");
+	if (!data) throw new Error("There is no data to DELETE");
+
+	const response = await fetch(url, {
+		method: 'DELETE',
+		mode: 'cors',
+		cache: 'no-cache',
+		credentials: 'same-origin',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		redirect: 'follow',
+		referrerPolicy: 'no-referrer',
+		body: JSON.stringify(data)
+	});
+	return response.json();
+}
+
+const PutToServer = async (url, data) => {
+	if (!url) throw new Error("Url to PUT is empty");
+	if (!data) throw new Error("There is no data to DELETE");
+
+	const response = await fetch(url, {
+		method: 'PUT',
+		mode: 'cors',
+		cache: 'no-cache',
+		credentials: 'same-origin',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		redirect: 'follow',
+		referrerPolicy: 'no-referrer',
+		body: JSON.stringify(data)
+	});
+	return response.json();
+}
+
+function editarNovedad(id) {
+	console.log(id);//aca en realidad va a llamar a un PutToServer así hace el edit, falta construir ruta con llamado a sql
+}
+
+function borrarNovedad(id) {
+	console.log(id);//aca en realidad va a llamar a un DeleteToServer así hace el edit, falta construir ruta con llamado a sql
+}
+
+AgregarNovedad.onclick = function () {
+	modal.style.display = "block";
+}
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function () {
+	modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function (event) {
+	if (event.target == modal) {
+		modal.style.display = "none";
+	}
+
+}
+
+
+const GetToServer = async (url, data) => {
+	if (!url) throw new Error("Url to GET is empty");
+	console.log(url);
+	await fetch(url)
+		.then(function (response) {
+			response.json().then(function (data) {
+				TablaNovedades.innerHTML = "";
+				data.forEach(function (noticia, id) {
+					let tabContent = `
+					<tr>
+					<th scope="row">${noticia.id}</th>
+                    <td>${noticia.titulo}</td>
+					<td>
+					<button type="button" onclick=${editarNovedad} class="btn btn-success">Editar</button>
+				 	<button type="button" onclick=${borrarNovedad} class="btn btn-danger">Eliminar</button> 
+					</td>
+					</tr>`
+					TablaNovedades.innerHTML = TablaNovedades.innerHTML + tabContent;
+					console.log('puso noticia ', id);
+				});
+			});
+		})
+		.catch(function (response) {
+			response.json().then(function (data) {
+				console.log(data);
+			})
+		});
+}
+
 const SendMessage = async ({
 	name,
 	email,
@@ -35,6 +139,24 @@ const SendMessage = async ({
 	});
 }
 
+const SendNovedad = async ({
+	titulo,
+	subtitulo,
+	cuerpo
+}) => {
+	if (!titulo) throw new Error("At sending the new, the titulo is empty");
+	if (!subtitulo) throw new Error("At sending the new, the subtitulo is empty");
+	if (!cuerpo) throw new Error("At sending the new, the cuerpo is empty");
+	await PostToServer("/novedades", {
+		titulo,
+		subtitulo,
+		cuerpo
+	});
+	alert("enviado correctamente");
+
+}
+
+
 FormContact.addEventListener("submit", e => {
 	e.preventDefault();
 	SendMessage({
@@ -42,6 +164,21 @@ FormContact.addEventListener("submit", e => {
 		email: e.target.mail.value,
 		message: e.target.msg.value
 	});
+})
+
+FormNovedades.addEventListener("submit", e => {
+	e.preventDefault();
+	SendNovedad({
+		titulo: e.target.titulo.value,
+		subtitulo: e.target.subtitulo.value,
+		cuerpo: e.target.cuerpo.value
+	});
+})
+
+GetToServer("/novedades").then(function (pepito) {
+	console.log("funcionó");
+}).catch(function (pepito) {
+	console.log("error");
 })
 
 $(document).ready(function () {
@@ -60,6 +197,7 @@ $(document).ready(function () {
 		var activeTab = $(this).attr('href');
 		$(activeTab).show();
 		return false;
+
+
 	});
 });
-

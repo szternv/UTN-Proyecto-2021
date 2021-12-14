@@ -9,11 +9,7 @@ var session = require('express-session');
 var whatever = require('./../models/bd');
 var router = express.Router();
   var usuariosModel = require('../models/usuariosModel')
-  
-
-
-	
-
+  var novedadesModel = require('../models/novedadesModel');
 //   var pool  = mysql.createPool({
 // 	  connectionLimit:10,
 // 	  host:process.env.MYSQL_HOST,
@@ -29,9 +25,11 @@ var cookieParser = require('cookieParser');
 var loginRouter = require('./routes/admin/login');
 
 import contact from "./routes/contact";
+import novedades from "./routes/admin/novedades";
 
 
 const app = express();
+
 
 app.set("PORT", config.PORT);
 
@@ -44,7 +42,6 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-
 app.use(cors());
 app.use(morgan());
 app.use(express.urlencoded({
@@ -53,6 +50,8 @@ app.use(express.urlencoded({
 app.use(express.json());
 
 app.use("/contact", contact);
+app.use("/novedades", novedades);
+
 app.use('/admin/login', loginRouter);
 
 app.use(logger('dev'));
@@ -79,8 +78,12 @@ var secured = async(req,res,next) =>{
   }
 
   
+
+
+
   app.get("/home", secured, (req, res,next)=>res.render("index.hbs"));
   app.get("/", (_, res) => res.render("admin/login.hbs"));
+
 
 
   module.exports = app;

@@ -1,5 +1,6 @@
 var mysql = require('mysql');
 var util = require('util');
+var express = require('express');
 
 var pool  = mysql.createPool({
     connectionLimit:10,
@@ -11,4 +12,8 @@ var pool  = mysql.createPool({
 
   pool.query = util.promisify(pool.query);
 
+    if(pool != undefined){
+      console.log("conectado");
+    }
+  
   module.exports = pool;
