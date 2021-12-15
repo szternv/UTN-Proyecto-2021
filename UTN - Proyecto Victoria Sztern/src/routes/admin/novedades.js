@@ -41,7 +41,7 @@ router.post('/', function (req, res, next) {
         if (err) {
             res.status(404).send(JSON.stringify(err));
         } else {
-            res.status(200 ).send(JSON.stringify(rows));
+            res.status(200).send(JSON.stringify(rows));
         }
 
     });
@@ -50,16 +50,16 @@ router.post('/', function (req, res, next) {
 
 
 router.delete('/', function (req, res, next) {
-    let id = req.body.id
-    connection.query('SELECT * FROM novedades', function (err, rows) {
-
+    connection.query(`DELETE FROM novedades WHERE id = ${req.body.id}`, function (err) {
         if (err) {
             res.status(404).send(JSON.stringify(err));
         } else {
-            res.status(200).send(JSON.stringify(rows));
+            res.status(200).send({});
         }
 
-    });
+    }
+
+    )
 
 });
 

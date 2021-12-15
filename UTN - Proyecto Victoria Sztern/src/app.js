@@ -65,10 +65,12 @@ app.set('view engine', 'hbs');
   
 var secured = async(req,res,next) =>{
 	try{
+		console.log(req.session.id_user)
 	  if(req.session.id_user){
 		next();
 		return	
 	  }else{
+		  console.log("else");
 		res.redirect('/admin/login');
 	  }
   

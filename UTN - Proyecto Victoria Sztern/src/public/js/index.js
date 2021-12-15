@@ -4,7 +4,37 @@ let AgregarNovedad = document.querySelector("#AgregarNovedad");
 let FormNovedades = document.querySelector("#FormNovedades");
 let SubmitNovedad = document.querySelector("#SubmitNovedad");
 
+function crearElementoNovedad(noticia) {
+	const header = document.createElement("th")
+	const title = document.createElement("td")
+	const buttonEdit = document.createElement("button")
+	const buttonDelete = document.createElement("button")
+	const container = document.createElement("tr")
+	console.log(noticia);
 
+	header.setAttribute("scope", "row");
+	header.innerHTML = noticia.id;
+
+	title.innerHTML = noticia.titulo;
+	const containerButtons = document.createElement("td")
+
+	buttonEdit.className = "btn btn-success";
+	buttonDelete.className = "btn btn-danger";
+	buttonEdit.addEventListener("click", () => editarNovedades())
+
+	buttonDelete.addEventListener("click", () => DeleteNovedad(noticia.id));
+	buttonEdit.innerText = "Editar"
+	buttonDelete.innerText = "Borrar"
+	containerButtons.appendChild(buttonEdit)
+	containerButtons.appendChild(buttonDelete)
+
+	container.appendChild(header)
+	container.appendChild(title)
+	container.appendChild(containerButtons)
+	return container;
+
+
+};
 // Get the button that opens the modal
 var modal = document.getElementById("myModal");
 
@@ -49,9 +79,11 @@ const DeleteToServer = async (url, data) => {
 	return response.json();
 }
 
+
+
 const PutToServer = async (url, data) => {
 	if (!url) throw new Error("Url to PUT is empty");
-	if (!data) throw new Error("There is no data to DELETE");
+	if (!data) throw new Error("There is no data to PUT");
 
 	const response = await fetch(url, {
 		method: 'PUT',
@@ -69,11 +101,11 @@ const PutToServer = async (url, data) => {
 }
 
 function editarNovedad(id) {
-	console.log(id);//aca en realidad va a llamar a un PutToServer así hace el edit, falta construir ruta con llamado a sql
+	console.log(id);
 }
 
 function borrarNovedad(id) {
-	console.log(id);//aca en realidad va a llamar a un DeleteToServer así hace el edit, falta construir ruta con llamado a sql
+	console.log(id);
 }
 
 AgregarNovedad.onclick = function () {
@@ -102,17 +134,9 @@ const GetToServer = async (url, data) => {
 			response.json().then(function (data) {
 				TablaNovedades.innerHTML = "";
 				data.forEach(function (noticia, id) {
-					let tabContent = `
-					<tr>
-					<th scope="row">${noticia.id}</th>
-                    <td>${noticia.titulo}</td>
-					<td>
-					<button type="button" onclick=${editarNovedad} class="btn btn-success">Editar</button>
-				 	<button type="button" onclick=${borrarNovedad} class="btn btn-danger">Eliminar</button> 
-					</td>
-					</tr>`
-					TablaNovedades.innerHTML = TablaNovedades.innerHTML + tabContent;
-					console.log('puso noticia ', id);
+
+					TablaNovedades.appendChild(crearElementoNovedad(noticia));
+
 				});
 			});
 		})
@@ -156,6 +180,14 @@ const SendNovedad = async ({
 
 }
 
+
+const DeleteNovedad = async(id) => {
+	await DeleteToServer("/novedades", {
+		id,
+	});
+	 window.location.reload();
+
+}
 
 FormContact.addEventListener("submit", e => {
 	e.preventDefault();
